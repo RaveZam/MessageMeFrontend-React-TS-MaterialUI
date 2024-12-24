@@ -1,6 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Mainpage from "./Pages/Mainpage";
-import CredentialsSignInPage from "./Components/CredentialsSignInPage";
 import ChatIcon from "@mui/icons-material/Chat";
 import { AppProvider, type Navigation } from "@toolpad/core/AppProvider";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
@@ -8,7 +7,7 @@ import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import { useDemoRouter } from "@toolpad/core/internal";
-import { Box } from "@mui/material";
+import Signinpage from "./Pages/Signinpage";
 
 const NAVIGATION: Navigation = [
   // {
@@ -56,7 +55,7 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<Mainpage />} />
-          <Route path="/Signin" element={<CredentialsSignInPage />} />
+          <Route path="/Signin" element={<Signinpage />} />
         </Routes>
       </AppProvider>
     </Router>

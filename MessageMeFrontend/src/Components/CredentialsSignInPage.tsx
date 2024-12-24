@@ -37,16 +37,6 @@ export default function CredentialsSignInPage() {
           autoFocus: false,
           label: "Username",
         },
-        passwordField: {
-          // Hypothetical support for additional fields
-          label: "Confirm Password",
-          type: "password",
-        },
-        confirmPasswordField: {
-          // Hypothetical support for additional fields
-          label: "Confirm Password",
-          type: "password",
-        },
       }}
     />
   );
