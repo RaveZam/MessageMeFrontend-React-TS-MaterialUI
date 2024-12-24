@@ -32,10 +32,21 @@ export default function CredentialsSignInPage() {
     <SignInPage
       signIn={signIn}
       providers={providers}
-      slotProps={{ emailField: { autoFocus: false } }}
-      sx={{
-        minHeight: 0,
-        minWidth: 0,
+      slotProps={{
+        emailField: {
+          autoFocus: false,
+          label: "Username",
+        },
+        passwordField: {
+          // Hypothetical support for additional fields
+          label: "Confirm Password",
+          type: "password",
+        },
+        confirmPasswordField: {
+          // Hypothetical support for additional fields
+          label: "Confirm Password",
+          type: "password",
+        },
       }}
     />
   );
