@@ -1,7 +1,4 @@
-import { DisabledByDefault } from "@mui/icons-material";
-import { Dialog, DialogContent } from "@mui/material";
 import { SignInPage, type AuthProvider } from "@toolpad/core/SignInPage";
-import { useState } from "react";
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
 

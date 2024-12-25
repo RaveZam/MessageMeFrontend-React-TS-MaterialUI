@@ -6,7 +6,11 @@ export default function Signinpage() {
   const [register, setRegister] = useState<boolean>(true);
   return (
     <div>
-      {register ? <CredentialsRegisterPage /> : <CredentialsSignInPage />}
+      {register ? (
+        <CredentialsRegisterPage setRegister={setRegister} />
+      ) : (
+        <CredentialsSignInPage />
+      )}
     </div>
   );
 }

@@ -1,8 +1,12 @@
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { Container, TextField, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
+import LoadingButton from "@mui/lab/LoadingButton";
+
+import axios from "axios";
+import ResponsiveDialog from "./ResponsiveDialog";
 
 const SyledContainer = styled(Container)(() => ({
   display: "flex",
@@ -21,6 +25,7 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   gap: "16px", // Adjust the gap size as needed
   square: false,
   width: 420,
+  borderRadius: 12,
   height: 620,
   padding: theme.spacing(2),
   ...theme.typography.body2,
@@ -29,131 +34,157 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   alignItems: "center",
 }));
 
-export default function CredentialsRegisterPage() {
-  const [Email, SetEmail] = useState<string>("");
-  const [Username, setUsername] = useState<string>("");
-  const [Password, SetPassword] = useState<string>("");
+const CredentialsRegisterPage: React.FC<{
+  setRegister: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ setRegister }) => {
+  const [email, SetEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, SetPassword] = useState<string>("");
   const [ConfirmPassword, setconfirmPassword] = useState<string>("");
 
   const [error, setError] = useState<boolean>(false);
   const [passwordMatch, setpasswordMatch] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);
     if (!error && !passwordMatch) {
-      console.log("Logging in");
-      console.log(Email, Username, Password);
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/users/AddUser",
+          { email, username, password },
+        );
+        setTimeout(() => {
+          setOpen(true);
+          setLoading(false);
+          console.log("Register Success", response.data);
+        }, 1500);
+      } catch (error) {
+        console.error("Error During Registration", error);
+      }
     }
   };
 
   return (
-    <SyledContainer>
-      <form onSubmit={handleSubmit}>
-        <DemoPaper variant="outlined">
-          <BiSolidMessageRoundedDetail className="my-4 mt-8 scale-[4] text-blue-300" />
-          <Typography
-            sx={{
-              fontSize: "1.4rem",
-            }}
-          >
-            Register To MessageMe
-          </Typography>
-          <Typography
-            sx={{
-              mb: "8px",
-            }}
-            variant="subtitle2"
-          >
-            Welcome Please Register to Create your Account!
-          </Typography>
+    <>
+      <ResponsiveDialog
+        setRegister={setRegister}
+        open={open}
+        setOpen={setOpen}
+      />
+      <SyledContainer>
+        <form onSubmit={handleSubmit}>
+          <DemoPaper variant="outlined">
+            <BiSolidMessageRoundedDetail className="my-4 mt-8 scale-[4] text-blue-300" />
+            <Typography
+              sx={{
+                fontSize: "1.4rem",
+              }}
+            >
+              Register To MessageMe
+            </Typography>
+            <Typography
+              sx={{
+                mb: "8px",
+              }}
+              variant="subtitle2"
+            >
+              Welcome Please Register to Create your Account!
+            </Typography>
 
-          <StyledTextField
-            error={error}
-            value={Email}
-            onChange={(e) => SetEmail(e.target.value)}
-            id="outlined-basic"
-            label="Email"
-            variant="outlined"
-            onBlur={() => {
-              if (Email === "") {
-                setError(false); // Do not show error if email is empty
-              } else {
-                setError(!/^[^@]+@gmail\.com$/.test(Email)); // Validate if not empty
-              }
-            }}
-            helperText={error ? "Must Contain a Valid Email." : ""}
-            required
-            InputLabelProps={{
-              required: false, // Prevent the asterisk from showing
-            }}
-          />
-          <StyledTextField
-            id="username"
-            label="Username"
-            variant="outlined"
-            onChange={(e) => setUsername(e.target.value)}
-            value={Username}
-            required
-            InputLabelProps={{
-              required: false, // Prevent the asterisk from showing
-            }}
-          />
-          <StyledTextField
-            id="password"
-            label="Password"
-            variant="outlined"
-            type="password"
-            onChange={(e) => {
-              SetPassword(e.target.value);
-            }}
-            // onBlur={() => {
-            //   Password !== ConfirmPassword
-            //     ? setpasswordMatch(true)
-            //     : setpasswordMatch(false);
-            // }}
-            value={Password}
-            required
-            InputLabelProps={{
-              required: false, // Prevent the asterisk from showing
-            }}
-          />
+            <StyledTextField
+              error={error}
+              value={email}
+              onChange={(e) => SetEmail(e.target.value)}
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
+              onBlur={() => {
+                if (email === "") {
+                  setError(false); // Do not show error if email is empty
+                } else {
+                  setError(!/^[^@]+@gmail\.com$/.test(email)); // Validate if not empty
+                }
+              }}
+              helperText={error ? "Must Contain a Valid Email." : ""}
+              required
+              InputLabelProps={{
+                required: false, // Prevent the asterisk from showing
+              }}
+            />
+            <StyledTextField
+              id="username"
+              label="Username"
+              variant="outlined"
+              onChange={(e) => setUsername(e.target.value)}
+              value={username}
+              required
+              InputLabelProps={{
+                required: false, // Prevent the asterisk from showing
+              }}
+            />
+            <StyledTextField
+              id="password"
+              label="Password"
+              variant="outlined"
+              type="password"
+              onChange={(e) => {
+                SetPassword(e.target.value);
+              }}
+              // onBlur={() => {
+              //   Password !== ConfirmPassword
+              //     ? setpasswordMatch(true)
+              //     : setpasswordMatch(false);
+              // }}
+              value={password}
+              required
+              InputLabelProps={{
+                required: false, // Prevent the asterisk from showing
+              }}
+            />
 
-          {/* Confirm Password */}
-          <StyledTextField
-            error={passwordMatch}
-            id="confirm-password"
-            label="ConfirmPassword"
-            variant="outlined"
-            type="password"
-            onChange={(e) => setconfirmPassword(e.target.value)}
-            value={ConfirmPassword}
-            onBlur={() => {
-              Password !== ConfirmPassword
-                ? setpasswordMatch(true)
-                : setpasswordMatch(false);
-            }}
-            helperText={passwordMatch ? "Password Does Not Match." : ""}
-            required
-            InputLabelProps={{
-              required: false, // Prevent the asterisk from showing
-            }}
-          />
-          <Button
-            type="submit"
-            sx={{ width: "85%", mt: "4px" }}
-            variant="contained"
-          >
-            Register
-          </Button>
+            {/* Confirm Password */}
+            <StyledTextField
+              error={passwordMatch}
+              id="confirm-password"
+              label="ConfirmPassword"
+              variant="outlined"
+              type="password"
+              onChange={(e) => setconfirmPassword(e.target.value)}
+              value={ConfirmPassword}
+              onBlur={() => {
+                password !== ConfirmPassword
+                  ? setpasswordMatch(true)
+                  : setpasswordMatch(false);
+              }}
+              helperText={passwordMatch ? "Password Does Not Match." : ""}
+              required
+              InputLabelProps={{
+                required: false, // Prevent the asterisk from showing
+              }}
+            />
+            <LoadingButton
+              type="submit"
+              sx={{ width: "85%", mt: "4px" }}
+              variant="contained"
+              loading={loading}
+            >
+              Register
+            </LoadingButton>
 
-          <p>
-            Already Have An Account?{" "}
-            <a className="underline" href="">
-              Sign In
-            </a>
-          </p>
-        </DemoPaper>
-      </form>
-    </SyledContainer>
+            <p>
+              Already Have An Account?{" "}
+              <a className="underline" href="">
+                Sign In
+              </a>
+            </p>
+          </DemoPaper>
+        </form>
+      </SyledContainer>
+    </>
   );
-}
+};
+
+export default CredentialsRegisterPage;
