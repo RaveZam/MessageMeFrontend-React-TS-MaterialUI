@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { jwtDecode } from "jwt-decode";
 
 import axios from "axios";
 import ResponsiveDialog from "./ResponsiveDialog";
@@ -46,19 +47,39 @@ const CredentialsSignInPage: React.FC<{
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        "http://localhost:3000/api/users/AddUser",
-        { email, password },
-      );
-      setTimeout(() => {
-        setOpen(true);
+
+    if (!error) {
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          "http://localhost:3000/api/users/Login",
+          { email, password },
+        );
+
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setLoading(false);
+            localStorage.setItem("token", response.data.token);
+
+            const storedToken = localStorage.getItem("token");
+            console.log("Login Success", storedToken);
+
+            if (storedToken) {
+              try {
+                // Decode the token if it exists
+                const decoded: any = jwtDecode(storedToken);
+                // Get the email (or username) from the decoded token
+                console.log(decoded.email);
+              } catch (error) {
+                console.error("Error decoding token:", error);
+              }
+            }
+          }, 1500);
+        }
+      } catch (error) {
         setLoading(false);
-        console.log("Register Success", response.data);
-      }, 1500);
-    } catch (error) {
-      console.error("Error During Registration", error);
+        console.error("Error During Login", error);
+      }
     }
   };
 

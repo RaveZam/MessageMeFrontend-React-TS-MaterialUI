@@ -49,6 +49,7 @@ const CredentialsRegisterPage: React.FC<{
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    console.log(email, password);
 
     if (!error && !passwordMatch) {
       try {
