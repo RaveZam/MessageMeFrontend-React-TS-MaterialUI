@@ -49,9 +49,10 @@ const CredentialsRegisterPage: React.FC<{
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
+
     if (!error && !passwordMatch) {
       try {
+        setLoading(true);
         const response = await axios.post(
           "http://localhost:3000/api/users/AddUser",
           { email, username, password },
@@ -174,12 +175,17 @@ const CredentialsRegisterPage: React.FC<{
               Register
             </LoadingButton>
 
-            <p>
+            <span className="mt-2">
               Already Have An Account?{" "}
-              <a className="underline" href="">
+              <span
+                onClick={() => {
+                  setRegister(false); // Set the register state to false for sign-in
+                }}
+                className="underline hover:cursor-pointer hover:text-blue-200"
+              >
                 Sign In
-              </a>
-            </p>
+              </span>
+            </span>
           </DemoPaper>
         </form>
       </SyledContainer>
