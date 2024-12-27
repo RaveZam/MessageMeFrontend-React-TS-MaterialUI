@@ -2,7 +2,7 @@ import { IoPersonCircleSharp } from "react-icons/io5";
 
 export default function Listbar() {
   return (
-    <div className="h-screen max-h-screen w-2/6 border-r-[1px] border-[#848884] border-opacity-20 p-4">
+    <div className="h-screen max-h-screen w-3/6 border-r-[1px] border-[#848884] border-opacity-20 p-4">
       <h1>Chats</h1>
       <input
         type="text"
