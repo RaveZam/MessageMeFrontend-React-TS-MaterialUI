@@ -1,13 +1,19 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Mainpage from "./Pages/Mainpage";
 import ChatIcon from "@mui/icons-material/Chat";
-import { AppProvider, type Navigation } from "@toolpad/core/AppProvider";
+import {
+  AppProvider,
+  Router as MUIRouter,
+  Session,
+  type Navigation,
+} from "@toolpad/core/AppProvider";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ArchiveIcon from "@mui/icons-material/Archive";
-import { useDemoRouter } from "@toolpad/core/internal";
 import Signinpage from "./Pages/Signinpage";
+import * as React from "react";
 
 const NAVIGATION: Navigation = [
   // {
@@ -39,17 +45,46 @@ const NAVIGATION: Navigation = [
     kind: "divider",
   },
 ];
+const currentSession = {
+  user: {
+    name: "Example User",
+    email: "runielle04@gmail.com",
+    image: null,
+  },
+};
 
 export default function App() {
-  const router = useDemoRouter("/page");
+  const [session, setSession] = React.useState<Session | null>(currentSession);
+  const [pathname, setPathname] = React.useState("/dashboard");
+
+  const authentication = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSession(currentSession);
+      },
+      signOut: () => {
+        setSession(null);
+      },
+    };
+  }, []);
+
+  const router = React.useMemo<MUIRouter>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   return (
     <Router>
       <AppProvider
         navigation={NAVIGATION}
         router={router}
+        authentication={authentication}
+        session={session}
         branding={{
           title: "MessageMe",
-
           logo: <BiSolidMessageRoundedDetail className="mx-2 my-3 scale-[2]" />,
         }}
       >
