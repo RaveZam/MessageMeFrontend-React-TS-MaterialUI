@@ -4,10 +4,11 @@ import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { jwtDecode } from "jwt-decode";
 
 import axios from "axios";
 import ResponsiveDialog from "./ResponsiveDialog";
+import { useNavigate } from "react-router-dom";
+// import useSession from "../Hooks/useSession";
 
 const SyledContainer = styled(Container)(() => ({
   display: "flex",
@@ -45,6 +46,8 @@ const CredentialsSignInPage: React.FC<{
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -60,20 +63,7 @@ const CredentialsSignInPage: React.FC<{
           setTimeout(() => {
             setLoading(false);
             localStorage.setItem("token", response.data.token);
-
-            const storedToken = localStorage.getItem("token");
-            console.log("Login Success", storedToken);
-
-            if (storedToken) {
-              try {
-                // Decode the token if it exists
-                const decoded: any = jwtDecode(storedToken);
-                // Get the email (or username) from the decoded token
-                console.log(decoded.email);
-              } catch (error) {
-                console.error("Error decoding token:", error);
-              }
-            }
+            navigate("/");
           }, 1500);
         }
       } catch (error) {

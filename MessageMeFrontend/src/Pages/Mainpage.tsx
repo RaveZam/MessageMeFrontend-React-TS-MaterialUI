@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MenuList from "@mui/material/MenuList";
@@ -8,19 +7,20 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
-
 import {
   DashboardLayout,
   SidebarFooterProps,
 } from "@toolpad/core/DashboardLayout";
 import {
   Account,
+  AccountPopoverFooter,
   AccountPreview,
   AccountPreviewProps,
+  SignOutButton,
 } from "@toolpad/core/Account";
-
 import Listbar from "../Components/ChatComponents/Listbar";
 import Chatarea from "../Components/ChatComponents/Chatarea";
+import { jwtDecode } from "jwt-decode";
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
@@ -40,8 +40,8 @@ const accounts = [
   {
     id: 1,
     name: "Example User",
-    email: "bharatkashyap@outlook.com",
-    image: "https://avatars.githubusercontent.com/u/19550456",
+    email: "runielle04@gmail.com",
+    image: null,
     projects: [
       {
         id: 3,
@@ -105,9 +105,9 @@ function SidebarFooterAccountPopover() {
         ))}
       </MenuList>
       <Divider />
-      {/* <AccountPopoverFooter>
+      <AccountPopoverFooter>
         <SignOutButton />
-      </AccountPopoverFooter> */}
+      </AccountPopoverFooter>
     </Stack>
   );
 }
@@ -164,9 +164,11 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
-export default function DashboardLayoutAccountSidebar() {
+export default function Mainpage() {
   return (
     <DashboardLayout
+      sidebarExpandedWidth={300}
+      defaultSidebarCollapsed
       slots={{
         toolbarAccount: () => null,
         sidebarFooter: SidebarFooterAccount,
@@ -179,11 +181,3 @@ export default function DashboardLayoutAccountSidebar() {
     </DashboardLayout>
   );
 }
-
-// <DashboardLayout
-// slots={{}}
-// sidebarExpandedWidth={300}
-// defaultSidebarCollapsed
-// >
-//
-// </DashboardLayout>

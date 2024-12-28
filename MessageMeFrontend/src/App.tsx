@@ -15,6 +15,8 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import Signinpage from "./Pages/Signinpage";
 import * as React from "react";
 
+import useSession from "./Hooks/useSession";
+
 const NAVIGATION: Navigation = [
   // {
   //   kind: "header",
@@ -45,17 +47,39 @@ const NAVIGATION: Navigation = [
     kind: "divider",
   },
 ];
-const currentSession = {
-  user: {
-    name: "Example User",
-    email: "runielle04@gmail.com",
-    image: null,
-  },
-};
 
 export default function App() {
-  const [session, setSession] = React.useState<Session | null>(currentSession);
   const [pathname, setPathname] = React.useState("/dashboard");
+
+  const [currentSession, setcurrentSession] = React.useState<{
+    user: {
+      name: string;
+      email: string;
+      image: null;
+    };
+  }>({
+    user: {
+      name: "",
+      email: "",
+      image: null,
+    },
+  });
+
+  const storeSession = (decoded: { email: string; username: string }): void => {
+    console.log("Decoded session values:", decoded.email);
+    setcurrentSession({
+      user: {
+        name: decoded.username,
+        email: decoded.email,
+        image: null,
+      },
+    });
+    authentication.signIn();
+  };
+  useSession(storeSession);
+
+  const [session, setSession] = React.useState<Session | null>(currentSession);
+  console.log(session);
 
   const authentication = React.useMemo(() => {
     return {
