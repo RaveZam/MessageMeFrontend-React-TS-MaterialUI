@@ -12,8 +12,8 @@ import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import Signinpage from "./Pages/Signinpage";
 import * as React from "react";
-
-import useSession from "./Hooks/useSession";
+import { useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const NAVIGATION: Navigation = [
   // {
@@ -46,15 +46,17 @@ const NAVIGATION: Navigation = [
   },
 ];
 
+interface Session {
+  user: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+}
+
 export default function App() {
   const [pathname, setPathname] = React.useState("/dashboard");
-  const [currentSession, setcurrentSession] = React.useState<{
-    user: {
-      name: string;
-      email: string;
-      image: null;
-    };
-  }>({
+  const [currentSession, setcurrentSession] = React.useState<Session>({
     user: {
       name: "",
       email: "",
@@ -62,18 +64,21 @@ export default function App() {
     },
   });
 
-  const storeSession = (decoded: { email: string; username: string }): void => {
-    setcurrentSession({
-      user: {
-        name: decoded.username,
-        email: decoded.email,
-        image: null,
-      },
-    });
-    authentication.signIn();
-  };
-
-  useSession(storeSession);
+  const storedToken = localStorage.getItem("token");
+  useEffect(() => {
+    if (storedToken) {
+      const decoded = jwtDecode<{ email: string; username: string }>(
+        storedToken,
+      );
+      setcurrentSession({
+        user: {
+          name: decoded.username,
+          email: decoded.email,
+          image: null,
+        },
+      });
+    }
+  }, [storedToken]);
 
   const authentication = {
     signIn: () => {
@@ -113,7 +118,15 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<Mainpage />} />
-          <Route path="/SignIn" element={<Signinpage />} />
+          <Route
+            path="/SignIn"
+            element={
+              <Signinpage
+                setcurrentSession={setcurrentSession}
+                currentSession={currentSession}
+              />
+            }
+          />
         </Routes>
       </AppProvider>
     </Router>

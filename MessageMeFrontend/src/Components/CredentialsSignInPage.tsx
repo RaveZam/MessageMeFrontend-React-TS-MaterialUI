@@ -1,13 +1,14 @@
 import { Container, TextField, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import axios from "axios";
 import ResponsiveDialog from "./ResponsiveDialog";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 // import useSession from "../Hooks/useSession";
 
 const SyledContainer = styled(Container)(() => ({
@@ -35,10 +36,19 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   justifyItems: "center",
   alignItems: "center",
 }));
+interface Session {
+  user: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+}
 
 const CredentialsSignInPage: React.FC<{
+  currentSession: Session;
+  setcurrentSession: React.Dispatch<React.SetStateAction<Session>>;
   setRegister: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setRegister }) => {
+}> = ({ setRegister, currentSession, setcurrentSession }) => {
   const [email, SetEmail] = useState<string>("");
   const [password, SetPassword] = useState<string>("");
 
@@ -47,6 +57,18 @@ const CredentialsSignInPage: React.FC<{
   const [open, setOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  // const storeSession = (decoded: { email: string; username: string }): void => {
+  //   setcurrentSession({
+  //     user: {
+  //       name: decoded.username,
+  //       email: decoded.email,
+  //       image: null,
+  //     },
+  //   });
+  // };
+
+  // useSession(storeSession);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -63,6 +85,20 @@ const CredentialsSignInPage: React.FC<{
           setTimeout(() => {
             setLoading(false);
             localStorage.setItem("token", response.data.token);
+
+            const storedToken = localStorage.getItem("token");
+            if (storedToken) {
+              const decoded = jwtDecode<{ email: string; username: string }>(
+                storedToken,
+              );
+              setcurrentSession({
+                user: {
+                  name: decoded.username,
+                  email: decoded.email,
+                  image: null,
+                },
+              });
+            }
             navigate("/");
           }, 1500);
         }
