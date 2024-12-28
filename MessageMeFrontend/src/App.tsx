@@ -1,11 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import Mainpage from "./Pages/Mainpage";
 import ChatIcon from "@mui/icons-material/Chat";
 import {
   AppProvider,
   Router as MUIRouter,
-  Session,
   type Navigation,
 } from "@toolpad/core/AppProvider";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
@@ -65,7 +63,6 @@ export default function App() {
   });
 
   const storeSession = (decoded: { email: string; username: string }): void => {
-    console.log("1");
     setcurrentSession({
       user: {
         name: decoded.username,
@@ -73,25 +70,26 @@ export default function App() {
         image: null,
       },
     });
-    console.log("2");
     authentication.signIn();
   };
 
   useSession(storeSession);
 
-  const [session, setSession] = React.useState<Session | null>(currentSession);
-
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        console.log("3");
-        setSession(currentSession);
-      },
-      signOut: () => {
-        setSession(null);
-      },
-    };
-  }, []);
+  const authentication = {
+    signIn: () => {
+      console.log("Signin");
+    },
+    signOut: () => {
+      localStorage.removeItem("token");
+      setcurrentSession({
+        user: {
+          name: "",
+          email: "",
+          image: null,
+        },
+      });
+    },
+  };
 
   const router = React.useMemo<MUIRouter>(() => {
     return {
@@ -107,7 +105,7 @@ export default function App() {
         navigation={NAVIGATION}
         router={router}
         authentication={authentication}
-        session={session}
+        session={currentSession}
         branding={{
           title: "MessageMe",
           logo: <BiSolidMessageRoundedDetail className="mx-2 my-3 scale-[2]" />,
@@ -115,7 +113,7 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<Mainpage />} />
-          <Route path="/Signin" element={<Signinpage />} />
+          <Route path="/SignIn" element={<Signinpage />} />
         </Routes>
       </AppProvider>
     </Router>

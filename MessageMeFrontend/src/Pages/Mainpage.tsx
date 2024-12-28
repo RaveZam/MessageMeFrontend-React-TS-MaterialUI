@@ -21,6 +21,8 @@ import {
 import Listbar from "../Components/ChatComponents/Listbar";
 import Chatarea from "../Components/ChatComponents/Chatarea";
 import { jwtDecode } from "jwt-decode";
+import { LocalSeeTwoTone } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
@@ -165,6 +167,13 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
 }
 
 export default function Mainpage() {
+  const navigate = useNavigate();
+
+  const storedToken = localStorage.getItem("token");
+  if (!storedToken) {
+    navigate("/SignIn");
+  }
+
   return (
     <DashboardLayout
       sidebarExpandedWidth={300}
