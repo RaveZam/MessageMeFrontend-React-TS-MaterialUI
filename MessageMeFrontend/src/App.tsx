@@ -65,6 +65,13 @@ export default function App() {
   });
 
   const storedToken = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!storedToken) {
+      console.log("Please Login");
+    }
+  }, [storedToken]);
+
   useEffect(() => {
     if (storedToken) {
       const decoded = jwtDecode<{ email: string; username: string }>(

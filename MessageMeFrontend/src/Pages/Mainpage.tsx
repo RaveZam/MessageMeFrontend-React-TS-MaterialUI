@@ -170,9 +170,12 @@ export default function Mainpage() {
   const navigate = useNavigate();
 
   const storedToken = localStorage.getItem("token");
-  if (!storedToken) {
-    navigate("/SignIn");
-  }
+  React.useEffect(() => {
+    if (!storedToken) {
+      console.log("Please Login");
+      navigate("/SignIn");
+    }
+  }, [storedToken]);
 
   return (
     <DashboardLayout
