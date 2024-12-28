@@ -50,7 +50,6 @@ const NAVIGATION: Navigation = [
 
 export default function App() {
   const [pathname, setPathname] = React.useState("/dashboard");
-
   const [currentSession, setcurrentSession] = React.useState<{
     user: {
       name: string;
@@ -66,7 +65,7 @@ export default function App() {
   });
 
   const storeSession = (decoded: { email: string; username: string }): void => {
-    console.log("Decoded session values:", decoded.email);
+    console.log("1");
     setcurrentSession({
       user: {
         name: decoded.username,
@@ -74,16 +73,18 @@ export default function App() {
         image: null,
       },
     });
+    console.log("2");
     authentication.signIn();
   };
+
   useSession(storeSession);
 
   const [session, setSession] = React.useState<Session | null>(currentSession);
-  console.log(session);
 
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
+        console.log("3");
         setSession(currentSession);
       },
       signOut: () => {
