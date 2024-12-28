@@ -120,12 +120,7 @@ export default function App() {
           <Route path="/" element={<Mainpage />} />
           <Route
             path="/SignIn"
-            element={
-              <Signinpage
-                setcurrentSession={setcurrentSession}
-                currentSession={currentSession}
-              />
-            }
+            element={<Signinpage setcurrentSession={setcurrentSession} />}
           />
         </Routes>
       </AppProvider>

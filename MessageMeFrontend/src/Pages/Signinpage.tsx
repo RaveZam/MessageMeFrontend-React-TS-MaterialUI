@@ -9,11 +9,9 @@ interface Session {
     image: string | null;
   };
 }
-
 const Signinpage: React.FC<{
-  currentSession: Session;
   setcurrentSession: React.Dispatch<React.SetStateAction<Session>>;
-}> = ({ currentSession, setcurrentSession }) => {
+}> = ({ setcurrentSession }) => {
   const [register, setRegister] = useState<boolean>(false);
   return (
     <div>
@@ -21,7 +19,6 @@ const Signinpage: React.FC<{
         <CredentialsRegisterPage setRegister={setRegister} />
       ) : (
         <CredentialsSignInPage
-          currentSession={currentSession}
           setcurrentSession={setcurrentSession}
           setRegister={setRegister}
         />
