@@ -92,6 +92,7 @@ export default function App() {
       console.log("Signin");
     },
     signOut: () => {
+      window.location.reload();
       localStorage.removeItem("token");
       setcurrentSession({
         user: {
@@ -124,9 +125,9 @@ export default function App() {
         }}
       >
         <Routes>
-          <Route path="/" element={<Mainpage />} />
+          <Route path="/Mainpage" element={<Mainpage />} />
           <Route
-            path="/SignIn"
+            path="/"
             element={<Signinpage setcurrentSession={setcurrentSession} />}
           />
         </Routes>

@@ -1,6 +1,41 @@
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
 import { IoPersonCircleSharp } from "react-icons/io5";
 
+// interface ChatRoom {
+//   _id: string;
+//   chatname: string;
+//   participants: string[];
+//   createdAt: string;
+// }
+
 export default function Listbar() {
+  const [chatRooms, setChatRooms] = useState([]);
+
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode<{
+        email: string;
+        id: string;
+        username: string;
+      }>(token);
+
+      const fetchChatRooms = async () => {
+        const response = await axios.post(
+          "http://localhost:3000/api/chat/getChatRooms",
+          {
+            id: decoded.id,
+          },
+        );
+
+        setChatRooms(response.data.chatRooms);
+      };
+      fetchChatRooms();
+    }
+  }, [token]);
+
   return (
     <div className="h-screen max-h-screen w-3/6 border-r-[1px] border-[#848884] border-opacity-20 p-4">
       <h1>Chats</h1>
@@ -13,6 +48,7 @@ export default function Listbar() {
         <div className="flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200">
           <IoPersonCircleSharp className="text-[4rem]" />
           <div className="px-4">
+            <button onClick={() => console.log(chatRooms)}>Log Rooms</button>
             <h1 className="py-1">Example User</h1>
             <span>Hello</span>
           </div>

@@ -25,7 +25,7 @@ const StyledTextField = styled(TextField)(() => ({
 const DemoPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: "16px", // Adjust the gap size as needed
+  gap: "16px",
   square: false,
   width: 420,
   borderRadius: 12,
@@ -76,9 +76,12 @@ const CredentialsSignInPage: React.FC<{
 
             const storedToken = localStorage.getItem("token");
             if (storedToken) {
-              const decoded = jwtDecode<{ email: string; username: string }>(
-                storedToken,
-              );
+              const decoded = jwtDecode<{
+                email: string;
+                username: string;
+                id: string;
+              }>(storedToken);
+
               setcurrentSession({
                 user: {
                   name: decoded.username,
@@ -87,7 +90,7 @@ const CredentialsSignInPage: React.FC<{
                 },
               });
             }
-            navigate("/");
+            navigate("/Mainpage");
           }, 1500);
         }
       } catch (error) {

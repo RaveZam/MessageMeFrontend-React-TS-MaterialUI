@@ -20,8 +20,6 @@ import {
 } from "@toolpad/core/Account";
 import Listbar from "../Components/ChatComponents/Listbar";
 import Chatarea from "../Components/ChatComponents/Chatarea";
-import { jwtDecode } from "jwt-decode";
-import { LocalSeeTwoTone } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
@@ -173,23 +171,31 @@ export default function Mainpage() {
   React.useEffect(() => {
     if (!storedToken) {
       console.log("Please Login");
-      navigate("/SignIn");
+      navigate("/");
     }
   }, [storedToken]);
 
   return (
-    <DashboardLayout
-      sidebarExpandedWidth={300}
-      defaultSidebarCollapsed
-      slots={{
-        toolbarAccount: () => null,
-        sidebarFooter: SidebarFooterAccount,
-      }}
-    >
-      <div className="flex overflow-hidden">
-        <Listbar />
-        <Chatarea />
-      </div>
-    </DashboardLayout>
+    <>
+      {storedToken ? (
+        <DashboardLayout
+          sidebarExpandedWidth={300}
+          defaultSidebarCollapsed
+          slots={{
+            toolbarAccount: () => null,
+            sidebarFooter: SidebarFooterAccount,
+          }}
+        >
+          <div className="flex overflow-hidden">
+            <Listbar />
+            <Chatarea />
+          </div>
+        </DashboardLayout>
+      ) : (
+        <div>
+          <h1>Redirecting To Singin</h1>
+        </div>
+      )}
+    </>
   );
 }
