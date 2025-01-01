@@ -3,15 +3,14 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { IoPersonCircleSharp } from "react-icons/io5";
 
-// interface ChatRoom {
-//   _id: string;
-//   chatname: string;
-//   participants: string[];
-//   createdAt: string;
-// }
+type ChatRoom = {
+  otherParticipantName: string;
+  chatname: string;
+  participants: string;
+};
 
 export default function Listbar() {
-  const [chatRooms, setChatRooms] = useState([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
   const token = localStorage.getItem("token");
   useEffect(() => {
@@ -23,14 +22,17 @@ export default function Listbar() {
       }>(token);
 
       const fetchChatRooms = async () => {
-        const response = await axios.post(
-          "http://localhost:3000/api/chat/getChatRooms",
-          {
-            id: decoded.id,
-          },
-        );
-
-        setChatRooms(response.data.chatRooms);
+        try {
+          const response = await axios.post(
+            "http://localhost:3000/api/chat/getChatRooms",
+            {
+              id: decoded.id,
+            },
+          );
+          setChatRooms(response.data.chatRoomName);
+        } catch (error) {
+          console.log(error);
+        }
       };
       fetchChatRooms();
     }
@@ -45,14 +47,18 @@ export default function Listbar() {
         placeholder="Search User..."
       />
       <div>
-        <div className="flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200">
-          <IoPersonCircleSharp className="text-[4rem]" />
-          <div className="px-4">
-            <button onClick={() => console.log(chatRooms)}>Log Rooms</button>
-            <h1 className="py-1">Example User</h1>
-            <span>Hello</span>
+        {chatRooms.map((chatroom) => (
+          <div
+            key={chatroom.chatname}
+            className="flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200"
+          >
+            <IoPersonCircleSharp className="text-[4rem]" />
+            <div className="px-4">
+              <h1 className="py-1">{chatroom.otherParticipantName}</h1>
+              <span>Hello</span>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
