@@ -6,7 +6,11 @@ import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import axios from "axios";
+
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import ResponsiveDialog from "./ResponsiveDialog";
+// import useSession from "../Hooks/useSession";
 
 const SyledContainer = styled(Container)(() => ({
   display: "flex",
@@ -22,11 +26,11 @@ const StyledTextField = styled(TextField)(() => ({
 const DemoPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: "16px", // Adjust the gap size as needed
+  gap: "16px",
   square: false,
   width: 420,
   borderRadius: 12,
-  height: 620,
+  height: 450,
   padding: theme.spacing(2),
   ...theme.typography.body2,
   textAlign: "center",
@@ -34,37 +38,65 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   alignItems: "center",
 }));
 
-const CredentialsRegisterPage: React.FC<{
+interface Session {
+  user: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+}
+
+const CredentialsSignInPage: React.FC<{
+  setcurrentSession: React.Dispatch<React.SetStateAction<Session>>;
   setRegister: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setRegister }) => {
+}> = ({ setRegister, setcurrentSession }) => {
   const [email, SetEmail] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
   const [password, SetPassword] = useState<string>("");
-  const [ConfirmPassword, setconfirmPassword] = useState<string>("");
 
   const [error, setError] = useState<boolean>(false);
-  const [passwordMatch, setpasswordMatch] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(email, password);
 
-    if (!error && !passwordMatch) {
+    if (!error) {
       try {
         setLoading(true);
         const response = await axios.post(
-          "http://localhost:3000/api/users/AddUser",
-          { email, username, password },
+          "http://localhost:3000/api/users/Login",
+          { email, password },
         );
-        setTimeout(() => {
-          setOpen(true);
-          setLoading(false);
-          console.log("Register Success", response.data);
-        }, 1500);
+
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setLoading(false);
+            localStorage.setItem("token", response.data.token);
+
+            const storedToken = localStorage.getItem("token");
+            if (storedToken) {
+              const decoded = jwtDecode<{
+                email: string;
+                username: string;
+                id: string;
+              }>(storedToken);
+
+              setcurrentSession({
+                user: {
+                  name: decoded.username,
+                  email: decoded.email,
+                  image: null,
+                },
+              });
+            }
+            navigate("/Mainpage");
+          }, 1500);
+        }
       } catch (error) {
-        console.error("Error During Registration", error);
+        setLoading(false);
+        console.error("Error During Login", error);
       }
     }
   };
@@ -85,7 +117,7 @@ const CredentialsRegisterPage: React.FC<{
                 fontSize: "1.4rem",
               }}
             >
-              Register To MessageMe
+              Sign In To MessageMe
             </Typography>
             <Typography
               sx={{
@@ -93,7 +125,7 @@ const CredentialsRegisterPage: React.FC<{
               }}
               variant="subtitle2"
             >
-              Welcome Please Register to Create your Account!
+              Welcome Please Sign In to your Account!
             </Typography>
 
             <StyledTextField
@@ -117,17 +149,6 @@ const CredentialsRegisterPage: React.FC<{
               }}
             />
             <StyledTextField
-              id="username"
-              label="Username"
-              variant="outlined"
-              onChange={(e) => setUsername(e.target.value)}
-              value={username}
-              required
-              InputLabelProps={{
-                required: false, // Prevent the asterisk from showing
-              }}
-            />
-            <StyledTextField
               id="password"
               label="Password"
               variant="outlined"
@@ -135,11 +156,6 @@ const CredentialsRegisterPage: React.FC<{
               onChange={(e) => {
                 SetPassword(e.target.value);
               }}
-              // onBlur={() => {
-              //   Password !== ConfirmPassword
-              //     ? setpasswordMatch(true)
-              //     : setpasswordMatch(false);
-              // }}
               value={password}
               required
               InputLabelProps={{
@@ -147,44 +163,24 @@ const CredentialsRegisterPage: React.FC<{
               }}
             />
 
-            {/* Confirm Password */}
-            <StyledTextField
-              error={passwordMatch}
-              id="confirm-password"
-              label="ConfirmPassword"
-              variant="outlined"
-              type="password"
-              onChange={(e) => setconfirmPassword(e.target.value)}
-              value={ConfirmPassword}
-              onBlur={() => {
-                password !== ConfirmPassword
-                  ? setpasswordMatch(true)
-                  : setpasswordMatch(false);
-              }}
-              helperText={passwordMatch ? "Password Does Not Match." : ""}
-              required
-              InputLabelProps={{
-                required: false, // Prevent the asterisk from showing
-              }}
-            />
             <LoadingButton
               type="submit"
               sx={{ width: "85%", mt: "4px" }}
               variant="contained"
               loading={loading}
             >
-              Register
+              Sign In
             </LoadingButton>
 
             <span className="mt-2">
-              Already Have An Account?{" "}
+              Dont Have An Account?{" "}
               <span
                 onClick={() => {
-                  setRegister(false); // Set the register state to false for sign-in
+                  setRegister(true); // Set the register state to false for sign-in
                 }}
                 className="underline hover:cursor-pointer hover:text-blue-200"
               >
-                Sign In
+                Register
               </span>
             </span>
           </DemoPaper>
@@ -194,4 +190,4 @@ const CredentialsRegisterPage: React.FC<{
   );
 };
 
-export default CredentialsRegisterPage;
+export default CredentialsSignInPage;

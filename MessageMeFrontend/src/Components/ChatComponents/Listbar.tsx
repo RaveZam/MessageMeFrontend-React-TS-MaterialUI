@@ -1,43 +1,9 @@
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import { useEffect, useState } from "react";
 import { IoPersonCircleSharp } from "react-icons/io5";
+import { ChatRoom } from "../../types/chat";
 
-type ChatRoom = {
-  otherParticipantName: string;
-  chatname: string;
-  participants: string;
-};
-
-export default function Listbar() {
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
-
-  const token = localStorage.getItem("token");
-  useEffect(() => {
-    if (token) {
-      const decoded = jwtDecode<{
-        email: string;
-        id: string;
-        username: string;
-      }>(token);
-
-      const fetchChatRooms = async () => {
-        try {
-          const response = await axios.post(
-            "http://localhost:3000/api/chat/getChatRooms",
-            {
-              id: decoded.id,
-            },
-          );
-          setChatRooms(response.data.chatRoomName);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      fetchChatRooms();
-    }
-  }, [token]);
-
+const Listbar: React.FC<{
+  chatRooms: ChatRoom[];
+}> = ({ chatRooms }) => {
   return (
     <div className="h-screen max-h-screen w-3/6 border-r-[1px] border-[#848884] border-opacity-20 p-4">
       <h1>Chats</h1>
@@ -62,4 +28,6 @@ export default function Listbar() {
       </div>
     </div>
   );
-}
+};
+
+export default Listbar;

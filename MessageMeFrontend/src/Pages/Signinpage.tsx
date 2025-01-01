@@ -1,6 +1,6 @@
 import { useState } from "react";
-import CredentialsSignInPage from "../Components/CredentialsSignInPage";
-import CredentialsRegisterPage from "../Components/CredentialsRegisterPage";
+import CredentialsRegisterPage from "../Components/Sing Up Components/CredentialsRegisterPage";
+import CredentialsSignInPage from "../Components/Sing Up Components/CredentialsSignInPage";
 
 interface Session {
   user: {
