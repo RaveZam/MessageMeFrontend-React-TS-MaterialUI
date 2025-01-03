@@ -1,4 +1,3 @@
-import * as React from "react";
 import { ChatRoom } from "../types/chat";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import Listbar from "../Components/ChatComponents/Listbar";
@@ -7,14 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import SidebarFooterAccount from "../Components/Sidebar Components/SidebarFooterAccount";
+import { useEffect, useState } from "react";
 
 export default function Mainpage() {
-  const [chatRooms, setChatRooms] = React.useState<ChatRoom[]>([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!token) {
       console.log("Please Login");
       navigate("/");
@@ -44,6 +44,8 @@ export default function Mainpage() {
     }
   }, [token]);
 
+  const [selectedUser, setSelectedUser] = useState<string>("");
+
   return (
     <>
       {token ? (
@@ -56,7 +58,11 @@ export default function Mainpage() {
           }}
         >
           <div className="flex overflow-hidden">
-            <Listbar chatRooms={chatRooms} />
+            <Listbar
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              chatRooms={chatRooms}
+            />
             <Chatarea />
           </div>
         </DashboardLayout>
