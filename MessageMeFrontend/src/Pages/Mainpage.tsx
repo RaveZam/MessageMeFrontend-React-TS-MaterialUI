@@ -63,7 +63,7 @@ export default function Mainpage() {
               setSelectedUser={setSelectedUser}
               chatRooms={chatRooms}
             />
-            <Chatarea />
+            <Chatarea selectedUser={selectedUser} />
           </div>
         </DashboardLayout>
       ) : (

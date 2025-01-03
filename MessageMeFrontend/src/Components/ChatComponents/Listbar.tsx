@@ -46,8 +46,8 @@ const Listbar: React.FC<{
           chatRooms.map((chatroom) => (
             <div
               onClick={() => setSelectedUser(chatroom.otherParticipantName)}
-              key={chatroom.chatname}
-              className={`flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200 ${
+              key={chatroom._id}
+              className={`my-2 flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200 ${
                 selectedUser === chatroom.otherParticipantName
                   ? "rounded-md bg-gray-800"
                   : ""
