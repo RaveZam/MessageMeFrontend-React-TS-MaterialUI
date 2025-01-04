@@ -7,10 +7,11 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import SidebarFooterAccount from "../Components/Sidebar Components/SidebarFooterAccount";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 export default function Mainpage() {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -19,10 +20,8 @@ export default function Mainpage() {
   useEffect(() => {
     connectionLimiter++;
     if (connectionLimiter < 2) {
-      const socket = io("http://localhost:3001");
-      socket.on("welcome", (message) => {
-        console.log(message);
-      });
+      const newSocket = io("http://localhost:3001");
+      setSocket(newSocket);
     }
   }, []);
 
@@ -76,10 +75,16 @@ export default function Mainpage() {
               setselectedChatroom={setselectedChatroom}
               chatRooms={chatRooms}
             />
-            <Chatarea
-              chatRooms={chatRooms}
-              selectedChatroom={selectedChatroom}
-            />
+            {socket ? (
+              <Chatarea
+                socket={socket}
+                chatRooms={chatRooms}
+                selectedChatroom={selectedChatroom}
+                setChatRooms={setChatRooms}
+              />
+            ) : (
+              ""
+            )}
           </div>
         </DashboardLayout>
       ) : (

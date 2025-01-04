@@ -1,5 +1,6 @@
 export type ChatRoom = {
   otherParticipantName: string;
+  SessionUser: string;
   chatname: string;
   participants: string;
   _id: string;

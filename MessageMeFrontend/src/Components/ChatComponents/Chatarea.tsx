@@ -1,11 +1,42 @@
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { ChatRoom } from "../../types/chat";
+import { Socket } from "socket.io-client";
+import { useEffect, useState } from "react";
 
 const Chatarea: React.FC<{
   selectedChatroom: string;
   chatRooms: ChatRoom[];
-}> = ({ selectedChatroom, chatRooms }) => {
+  socket: Socket;
+  setChatRooms: React.Dispatch<React.SetStateAction<ChatRoom[]>>;
+}> = ({ selectedChatroom, chatRooms, socket, setChatRooms }) => {
   const chatRoom = chatRooms.find((room) => room._id === selectedChatroom);
+
+  const [newMessage, setNewMessage] = useState<string>("");
+  const [messages, setMessages] = useState<[]>([]);
+
+  const sendMessage = () => {
+    if (newMessage.trim()) {
+      const message = {
+        message: newMessage,
+        sentBy: chatRoom?.SessionUser,
+      };
+
+      socket.emit("sendMessage", { roomId: chatRoom?._id, message });
+    }
+  };
+
+  // Need to start updating that message either on a seperate Array or edit the chatRoom itself
+
+  // setChatRooms([{
+  //   ...chatRoom, // Spread the existing chatRoom
+  //   messages: [...chatRoom.messages, message] // Add the new message to the messages array
+  // }]);
+  const handleKeyStroke = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      console.log("Enter Pressed");
+    }
+  };
 
   return (
     <>
@@ -29,7 +60,7 @@ const Chatarea: React.FC<{
             <div className="flex">
               <IoPersonCircleSharp className="mr-1 flex-shrink-0 text-[3rem]" />
               <div className="ml-1">
-                <div className="flex gap-x-1">
+                <div className="flex w-[80%] gap-x-1">
                   <h1>{chatRoom.otherParticipantName}</h1>
                   <span className="opacity-80">12:00pm</span>
                 </div>
@@ -46,6 +77,7 @@ const Chatarea: React.FC<{
               type="text"
               className="m-4 w-full rounded-md bg-gray-800 p-4"
               placeholder="Write Something..."
+              onKeyDown={(e) => handleKeyStroke(e)}
             />
           </div>
         </div>
