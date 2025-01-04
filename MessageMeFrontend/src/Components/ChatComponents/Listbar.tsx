@@ -6,9 +6,9 @@ import { Users } from "../../types/user";
 
 const Listbar: React.FC<{
   chatRooms: ChatRoom[];
-  selectedUser: string;
-  setSelectedUser: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ chatRooms, selectedUser, setSelectedUser }) => {
+  selectedChatroom: string;
+  setselectedChatroom: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ chatRooms, selectedChatroom, setselectedChatroom }) => {
   const [searchUser, setSearchUser] = useState<string>("");
   const [users, setUsers] = useState<Users[]>([]);
 
@@ -45,10 +45,10 @@ const Listbar: React.FC<{
         {searchUser.length == 0 ? (
           chatRooms.map((chatroom) => (
             <div
-              onClick={() => setSelectedUser(chatroom.otherParticipantName)}
+              onClick={() => setselectedChatroom(chatroom._id)}
               key={chatroom._id}
               className={`my-2 flex p-4 hover:cursor-pointer hover:rounded-md hover:bg-gray-800 hover:duration-200 ${
-                selectedUser === chatroom.otherParticipantName
+                selectedChatroom === chatroom._id
                   ? "rounded-md bg-gray-800"
                   : ""
               }`}

@@ -7,12 +7,26 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import SidebarFooterAccount from "../Components/Sidebar Components/SidebarFooterAccount";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function Mainpage() {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+
+  let connectionLimiter = 0;
+  useEffect(() => {
+    connectionLimiter++;
+    if (connectionLimiter < 2) {
+      const socket = io("http://localhost:3001");
+      socket.on("welcome", (message) => {
+        console.log(message);
+      });
+    }
+  }, []);
+
+  // i can use message for the actual message ,or data.message for the string value
 
   useEffect(() => {
     if (!token) {
@@ -44,8 +58,7 @@ export default function Mainpage() {
     }
   }, [token]);
 
-  const [selectedUser, setSelectedUser] = useState<string>("");
-
+  const [selectedChatroom, setselectedChatroom] = useState<string>("");
   return (
     <>
       {token ? (
@@ -59,11 +72,14 @@ export default function Mainpage() {
         >
           <div className="flex overflow-hidden">
             <Listbar
-              selectedUser={selectedUser}
-              setSelectedUser={setSelectedUser}
+              selectedChatroom={selectedChatroom}
+              setselectedChatroom={setselectedChatroom}
               chatRooms={chatRooms}
             />
-            <Chatarea selectedUser={selectedUser} />
+            <Chatarea
+              chatRooms={chatRooms}
+              selectedChatroom={selectedChatroom}
+            />
           </div>
         </DashboardLayout>
       ) : (
