@@ -1,13 +1,23 @@
+import { useEffect } from "react";
 import { IoPersonCircleSharp } from "react-icons/io5";
+import { io } from "socket.io-client";
 
 const Chatarea: React.FC<{ selectedUser: String }> = ({ selectedUser }) => {
+  useEffect(() => {
+    const socket = io("http://localhost:3001");
+
+    socket.on("welcome", (message) => {
+      console.log(message);
+    });
+  }, []);
+  // i can use message for the actual message ,or data.message for the string value
   return (
     <div className="flex w-5/6 flex-col">
       <div className="flex h-[6rem] w-full border-b-2 p-4">
         <IoPersonCircleSharp className="text-[4rem]" />
         <div className="px-2 py-2">
           <h1>{selectedUser}</h1>
-          <span className="text-green-400">Online</span>
+          <span className="text-green-400">Online </span>
         </div>
       </div>
       {/* //chat Area */}
