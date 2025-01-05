@@ -3,6 +3,7 @@ import { ChatRoom } from "../../types/chat";
 import { Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { Discount } from "@mui/icons-material";
 
 type tokenInterface = {
   email: string;
@@ -46,6 +47,12 @@ const Chatarea: React.FC<{
       });
     }
   }, [selectedChatroom]);
+
+  useEffect(() => {
+    socket.emit("disconnectFromRoom", { roomId: chatRoom?._id });
+  }, [selectedChatroom]);
+
+  //need to optimize the rooms, sometimes the the messages are sent to the previous selected room
 
   useEffect(() => {
     socket.on("receiveMessage", (message) => {
