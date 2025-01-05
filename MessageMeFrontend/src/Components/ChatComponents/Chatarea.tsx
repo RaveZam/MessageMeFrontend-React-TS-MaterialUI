@@ -2,6 +2,13 @@ import { IoPersonCircleSharp } from "react-icons/io5";
 import { ChatRoom } from "../../types/chat";
 import { Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+
+type tokenInterface = {
+  email: string;
+  username: string;
+  id: string;
+};
 
 const Chatarea: React.FC<{
   selectedChatroom: string;
@@ -9,32 +16,79 @@ const Chatarea: React.FC<{
   socket: Socket;
   setChatRooms: React.Dispatch<React.SetStateAction<ChatRoom[]>>;
 }> = ({ selectedChatroom, chatRooms, socket, setChatRooms }) => {
-  const chatRoom = chatRooms.find((room) => room._id === selectedChatroom);
+  const chatRoom: ChatRoom | undefined = chatRooms.find(
+    (room) => room._id === selectedChatroom,
+  );
+
+  const storedToken = localStorage.getItem("token");
+  const [myToken, setMyToken] = useState<tokenInterface>();
+
+  useEffect(() => {
+    if (storedToken) {
+      const decoded = jwtDecode<{
+        email: string;
+        username: string;
+        id: string;
+      }>(storedToken);
+      setMyToken(decoded);
+    }
+  }, [storedToken]);
 
   const [newMessage, setNewMessage] = useState<string>("");
-  const [messages, setMessages] = useState<[]>([]);
+
+  useEffect(() => {
+    if (selectedChatroom) {
+      let roomId = chatRoom?._id;
+      socket.emit("joinRoom", roomId);
+
+      socket.on("joinedRoom", (message) => {
+        console.log(message);
+      });
+    }
+  }, [selectedChatroom]);
+
+  useEffect(() => {
+    socket.on("receiveMessage", (message) => {
+      setChatRooms((prevChatRooms) =>
+        prevChatRooms.map((room) =>
+          room._id === chatRoom?._id
+            ? {
+                ...room,
+                messages: [...room.messages, message.message],
+              }
+            : room,
+        ),
+      );
+    });
+  }, [chatRoom?._id, socket, setChatRooms]);
 
   const sendMessage = () => {
-    if (newMessage.trim()) {
+    if (newMessage.trim() && chatRoom && myToken) {
       const message = {
         message: newMessage,
-        sentBy: chatRoom?.SessionUser,
+        sentBy: myToken.username,
       };
 
-      socket.emit("sendMessage", { roomId: chatRoom?._id, message });
+      socket.emit("sendMessage", { roomId: chatRoom._id, message });
+
+      setChatRooms((prevChatRooms) =>
+        prevChatRooms.map((room) =>
+          room._id === chatRoom._id
+            ? {
+                ...room,
+                messages: [...room.messages, message],
+              }
+            : room,
+        ),
+      );
     }
   };
 
-  // Need to start updating that message either on a seperate Array or edit the chatRoom itself
-
-  // setChatRooms([{
-  //   ...chatRoom, // Spread the existing chatRoom
-  //   messages: [...chatRoom.messages, message] // Add the new message to the messages array
-  // }]);
   const handleKeyStroke = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      console.log("Enter Pressed");
+      sendMessage();
+      setNewMessage("");
     }
   };
 
@@ -56,19 +110,42 @@ const Chatarea: React.FC<{
           </div>
 
           {/* Chat Area */}
-          <div className="m-4">
-            <div className="flex">
-              <IoPersonCircleSharp className="mr-1 flex-shrink-0 text-[3rem]" />
-              <div className="ml-1">
-                <div className="flex w-[80%] gap-x-1">
-                  <h1>{chatRoom.otherParticipantName}</h1>
-                  <span className="opacity-80">12:00pm</span>
-                </div>
-                <div className="my-4 max-w-[50%] rounded-lg bg-gray-700 p-4">
-                  <p>Lorem, ipsum dolor sit</p>
+          <div className="overflow-y-scroll">
+            {chatRoom.messages.map((message, index) => (
+              <div
+                className={`m-8 ${
+                  message.sentBy === myToken?.username
+                    ? "flex flex-row-reverse"
+                    : ""
+                }`}
+                key={index}
+              >
+                <div
+                  className={`flex ${
+                    message.sentBy === myToken?.username
+                      ? "flex flex-row-reverse"
+                      : ""
+                  }`}
+                >
+                  <IoPersonCircleSharp className="mx-1 flex-shrink-0 text-[3rem]" />
+                  <div className="my-1">
+                    <div
+                      className={`flex gap-x-1 ${
+                        message.sentBy === myToken?.username
+                          ? "flex flex-row-reverse"
+                          : ""
+                      }`}
+                    >
+                      <h1>{message.sentBy}</h1>
+                      {/* <span className="opacity-80">12:00pm</span> */}
+                    </div>
+                    <div className="my-4 rounded-lg bg-gray-700 p-4">
+                      <p>{message.message}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
 
           {/* Input Area */}
@@ -77,6 +154,8 @@ const Chatarea: React.FC<{
               type="text"
               className="m-4 w-full rounded-md bg-gray-800 p-4"
               placeholder="Write Something..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => handleKeyStroke(e)}
             />
           </div>
