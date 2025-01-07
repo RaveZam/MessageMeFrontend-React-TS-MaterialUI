@@ -53,6 +53,7 @@ const Chatarea: React.FC<{
   }, [selectedChatroom]);
 
   //need to optimize the rooms, sometimes the the messages are sent to the previous selected room
+  //ss
 
   useEffect(() => {
     socket.on("receiveMessage", (message) => {
